@@ -1,6 +1,6 @@
 cask "peel" do
-  version "1.1.0"
-  sha256 "a1a4e3d09118f99a399351506ad8292402fa11365eb6c4bf5b9d2870798c3c23"
+  version "1.1.2"
+  sha256 "ec1e12f43ca80f41b4263c762e62d8c6da7f58ae6911ce288ae9509c6fdd7376"
 
   url "https://api.douglaslassance.me/peel/download/#{version}"
   name "Peel"
