@@ -1,6 +1,6 @@
 cask "gitoptic" do
-  version "0.1.0"
-  sha256 "d64f424516affcda1e7af00fbbcfe5f56aef8a44ad37d1009586e32ec70af1da"
+  version "0.2.0"
+  sha256 "fabfab4682af000fe14f652d27614706f824384055ede7d4e5d684f59bc354c4"
 
   url "https://api.douglaslassance.me/gitoptic/download/#{version}/aarch64-apple-darwin",
       verified: "api.douglaslassance.me/gitoptic/"
