@@ -1,0 +1,271 @@
+# Ported from Homebrew/homebrew-cask's own CI, so this tap tests the way the
+# official cask tap does and stays mergeable with it:
+#
+#   https://github.com/Homebrew/homebrew-cask/blob/main/.github/workflows/ci.yml
+#
+# The shape is upstream's: `generate-matrix` runs `brew generate-cask-ci-matrix`,
+# which reads what each cask declares and emits one job per cask per runner, and
+# `test` fans out over that. Runners are never hardcoded here. Ship a cask for
+# another architecture and the matrix picks the runner up on its own.
+#
+# Adapted only where a third-party tap differs from homebrew/cask: this repo has
+# to be linked into Homebrew's Taps directory and trusted before its casks can
+# be loaded. Re-check against upstream when Homebrew changes their CI.
+
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+  merge_group:
+  workflow_dispatch:
+    inputs:
+      casks:
+        description: List of casks to audit (comma-separated)
+        required: true
+      skip_install:
+        description: Skip installation of casks
+        required: false
+        default: true
+        type: boolean
+      new_cask:
+        description: Apply new cask audit
+        required: false
+        default: false
+        type: boolean
+
+env:
+  TAP_SUFFIX: tap
+  HOMEBREW_DEVELOPER: 1
+  HOMEBREW_NO_AUTO_UPDATE: 1
+  HOMEBREW_NO_INSTALL_FROM_API: 1
+  HOMEBREW_GITHUB_API_TOKEN: ${{ github.token }}
+
+concurrency:
+  group: "${{ github.ref }}"
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  generate-matrix:
+    outputs:
+      matrix: ${{ steps.generate-matrix.outputs.matrix }}
+    runs-on: macos-latest
+    steps:
+      - name: Set up Homebrew
+        id: set-up-homebrew
+        uses: Homebrew/actions/setup-homebrew@3cdb78d0f62ad29dd32de765782654f4eedea607 # 2026.08.31.1
+        with:
+          core: false
+          cask: true
+
+      - name: Check out Pull Request
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Install this tap from the checkout
+        run: |
+          tap_dir="$(brew --repository)/Library/Taps/${GITHUB_REPOSITORY%%/*}/$(basename "${GITHUB_REPOSITORY}")"
+          mkdir -p "$(dirname "${tap_dir}")"
+          rm -rf "${tap_dir}"
+          ln -s "${GITHUB_WORKSPACE}" "${tap_dir}"
+          brew tap
+          brew trust "${TAP_NAME}"
+        env:
+          TAP_NAME: ${{ github.repository_owner }}/${{ env.TAP_SUFFIX }}
+
+      - name: Run brew config
+        run: brew config
+
+      - name: Generate CI matrix
+        id: generate-matrix
+        env:
+          INPUT_CASKS: ${{ github.event.inputs.casks }}
+          PULL_REQUEST_URL: ${{ github.event.pull_request.url }}
+        run: |
+          if [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]]
+          then
+            # shellcheck disable=SC2086 # $INPUT_CASKS is a space-separated list of cask tokens
+            brew generate-cask-ci-matrix ${{ github.event.inputs.skip_install && '--skip-install' }} ${{ github.event.inputs.new_cask && '--new' }} --casks $INPUT_CASKS
+          elif [[ "${GITHUB_EVENT_NAME}" == "push" || "${GITHUB_EVENT_NAME}" == "merge_group" ]]
+          then
+            brew generate-cask-ci-matrix --syntax-only
+          else
+            brew generate-cask-ci-matrix --url "$PULL_REQUEST_URL"
+          fi
+
+  test:
+    name: ${{ matrix.name }}
+    needs: generate-matrix
+    runs-on: ${{ matrix.runner }}
+    container: ${{ matrix.container || null }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
+    steps:
+      - name: Set up Homebrew
+        id: set-up-homebrew
+        uses: Homebrew/actions/setup-homebrew@3cdb78d0f62ad29dd32de765782654f4eedea607 # 2026.08.31.1
+        with:
+          core: true
+          cask: true
+          stable: ${{ matrix.stable || false }}
+
+      - name: Enable debug mode
+        run: |
+          echo 'HOMEBREW_DEBUG=1' >> "${GITHUB_ENV}"
+          echo 'HOMEBREW_VERBOSE=1' >> "${GITHUB_ENV}"
+        if: runner.debug
+
+      - name: Check out Pull Request
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Install this tap from the checkout
+        run: |
+          tap_dir="$(brew --repository)/Library/Taps/${GITHUB_REPOSITORY%%/*}/$(basename "${GITHUB_REPOSITORY}")"
+          mkdir -p "$(dirname "${tap_dir}")"
+          rm -rf "${tap_dir}"
+          ln -s "${GITHUB_WORKSPACE}" "${tap_dir}"
+          brew tap
+          brew trust "${TAP_NAME}"
+        env:
+          TAP_NAME: ${{ github.repository_owner }}/${{ env.TAP_SUFFIX }}
+
+      - name: Clean up CI machine
+        if: runner.os == 'macOS' && !matrix.stable
+        run: brew test-bot --cleanup --only-cleanup-before
+
+      - name: Cache Homebrew Gems
+        id: cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ steps.set-up-homebrew.outputs.gems-path }}
+          key: ${{ matrix.runner }}-rubygems-${{ steps.set-up-homebrew.outputs.gems-hash }}
+          restore-keys: ${{ matrix.runner }}-rubygems-
+
+      - name: Cache style cache
+        if: runner.os == 'macOS' && !matrix.stable
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/Library/Caches/Homebrew/style
+          key: macos-style-cache-${{ matrix.stable && 'stable-' || 'main-' }}${{ github.sha }}
+          restore-keys: macos-style-cache-${{ matrix.stable && 'stable-' || 'main-' }}
+
+      - name: Run brew config
+        run: brew config
+
+      - name: Run brew test-bot --only-tap-syntax
+        id: tap-syntax
+        run: brew test-bot --tap '${{ matrix.tap }}' --only-tap-syntax ${{ matrix.stable && '--stable' || '' }}
+        if: always() && !matrix.cask
+
+      - name: Run brew fetch --cask ${{ matrix.cask.token }}
+        id: fetch
+        run: |
+          brew fetch --cask --retry --force ${{ join(matrix.fetch_args, ' ') }} '${{ matrix.cask.path }}'
+        timeout-minutes: 30
+        if: >
+          always() &&
+          contains(fromJSON('["success", "skipped"]'), steps.tap-syntax.outcome) &&
+          matrix.cask
+
+      - name: Run brew audit --cask${{ (matrix.cask && ' ') || ' --tap ' }}${{ matrix.cask.token || matrix.tap }}
+        id: audit
+        run: |
+          brew audit --cask ${{ join(matrix.audit_args, ' ') }}${{ (matrix.cask && ' ') || ' --tap ' }}'${{ matrix.cask.token || matrix.tap }}'
+        timeout-minutes: 30
+        if: >
+          always() &&
+          contains(fromJSON('["success", "skipped"]'), steps.tap-syntax.outcome) &&
+          (!matrix.cask || steps.fetch.outcome == 'success') &&
+          !matrix.skip_audit
+
+      - name: Gather cask information
+        id: info
+        env:
+          CASK_PATH: ${{ matrix.cask.path }}
+        run: |
+          brew ruby -- - "$CASK_PATH" <<'EOF'
+            require 'cask/cask_loader'
+            require 'cask/installer'
+
+            cask = Cask::CaskLoader.load(ARGV.fetch(0))
+
+            manual_installer = cask.artifacts.any? do |artifact|
+              if defined?(artifact.manual_install)
+                artifact.manual_install
+              end
+            end
+
+            macos_requirement_satisfied = if macos_requirement = cask.depends_on.macos
+              macos_requirement.satisfied?
+            else
+              true
+            end
+
+
+            installer = Cask::Installer.new(cask)
+            cask_and_formula_dependencies = installer.missing_cask_and_formula_dependencies
+
+            formula_dependencies = cask_and_formula_dependencies.select { |d| d.is_a?(Formula) }.map(&:full_name)
+
+            File.open(ENV.fetch("GITHUB_OUTPUT"), "a") do |f|
+              f.puts "manual_installer=#{JSON.generate(manual_installer)}"
+              f.puts "macos_requirement_satisfied=#{JSON.generate(macos_requirement_satisfied)}"
+              f.puts "formula_dependencies=#{JSON.generate(formula_dependencies)}"
+            end
+
+          EOF
+        if: always() && steps.fetch.outcome == 'success' && matrix.cask
+
+      - name: Run brew uninstall --cask --force --zap ${{ matrix.cask.token }}
+        run: |
+          brew uninstall --cask --force --zap '${{ matrix.cask.path }}'
+        if: always() && steps.info.outcome == 'success'
+        timeout-minutes: 30
+
+      - name: Run brew install --cask ${{ matrix.cask.token }}
+        id: install
+        run: brew install --cask '${{ matrix.cask.path }}'
+        if: >
+          always() && steps.info.outcome == 'success' &&
+          fromJSON(steps.info.outputs.macos_requirement_satisfied) &&
+          !matrix.skip_install
+        timeout-minutes: 30
+
+      - name: Check for missing zap paths
+        run: |
+          brew ruby -r "$(brew --repository homebrew/cask)/cmd/lib/zap_check.rb" <<'EOF'
+            ZapCheck.run('${{ matrix.cask.path }}')
+          EOF
+        if: >
+          always() &&
+          steps.install.outcome == 'success' &&
+          runner.os == 'macOS'
+        continue-on-error: true
+        timeout-minutes: 10
+
+      - name: Run brew uninstall --cask ${{ matrix.cask.token }}
+        run: brew uninstall --cask '${{ matrix.cask.path }}'
+        if: always() && steps.install.outcome == 'success' && !fromJSON(steps.info.outputs.manual_installer)
+        timeout-minutes: 30
+
+  conclusion:
+    name: conclusion
+    needs: test
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Result
+        run: ${{ needs.test.result == 'success' }}
