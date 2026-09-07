@@ -1,6 +1,6 @@
 cask "playa" do
-  version "1.0.0"
-  sha256 "be1ce6d5e45189fb1bd00b5c92523d83e7618a2919f6f37b9db88004794d3b2f"
+  version "1.1.0"
+  sha256 "3951d3cb4b4dea8683007dbcf309d4f44b9448fa96733190bb0234de37006306"
 
   url "https://api.douglaslassance.me/playa/download/#{version}/aarch64-apple-darwin"
   name "Playa"
