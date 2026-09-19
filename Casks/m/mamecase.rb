@@ -2,13 +2,13 @@ cask "mamecase" do
   version "0.2.0"
   sha256 "ccb78ef2cfa2cd1723034ffc064343014f45ec07d6680e22fea6a32b51bd46ee"
 
-  url "https://api.douglaslassance.me/mamecase/download/#{version}/aarch64-apple-darwin"
+  url "https://api.douglaslassance.me/v1/mamecase/download/#{version}/aarch64-apple-darwin"
   name "Mamecase"
   desc "MAME front-end"
   homepage "https://mamecase.douglaslassance.me/"
 
   livecheck do
-    url "https://api.douglaslassance.me/mamecase"
+    url "https://api.douglaslassance.me/v1/mamecase"
     strategy :json do |json|
       json["latest"]
     end
