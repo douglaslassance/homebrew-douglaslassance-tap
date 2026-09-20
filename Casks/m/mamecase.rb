@@ -1,11 +1,11 @@
 cask "mamecase" do
-  version "0.2.0"
-  sha256 "ccb78ef2cfa2cd1723034ffc064343014f45ec07d6680e22fea6a32b51bd46ee"
+  version "0.3.0"
+  sha256 "f7d3806b78f9fee8a84c685b48254b3693264301451f76201e9ea3061ba9bdd9"
 
   url "https://api.douglaslassance.me/v1/mamecase/download/#{version}/aarch64-apple-darwin"
   name "Mamecase"
   desc "MAME front-end"
-  homepage "https://mamecase.douglaslassance.me/"
+  homepage "https://douglaslassance.me/mamecase"
 
   livecheck do
     url "https://api.douglaslassance.me/v1/mamecase"
