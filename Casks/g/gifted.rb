@@ -1,6 +1,6 @@
 cask "gifted" do
-  version "0.2.0"
-  sha256 "43905d740ebbbecb274c2d4abef936bdf592ddb5d7b7eb3ebeaad9a2ba6a08ed"
+  version "0.3.0"
+  sha256 "5132061775053d204f89b508536e5fd212cae6dffeea8b5457a8ae69b571af45"
 
   url "https://api.douglaslassance.me/v1/gifted/download/#{version}/aarch64-apple-darwin"
   name "Gifted"
@@ -19,8 +19,8 @@ cask "gifted" do
   app "Gifted.app"
 
   zap trash: [
-    "~/Library/Application Support/com.douglaslassance.gifted",
-    "~/Library/Caches/com.douglaslassance.gifted",
-    "~/Library/Preferences/com.douglaslassance.gifted.plist",
+    "~/Library/Application Support/me.douglaslassance.gifted",
+    "~/Library/Caches/me.douglaslassance.gifted",
+    "~/Library/Preferences/me.douglaslassance.gifted.plist",
   ]
 end
