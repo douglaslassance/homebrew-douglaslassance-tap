@@ -1,11 +1,11 @@
 cask "gitoptic" do
-  version "0.2.0"
-  sha256 "fabfab4682af000fe14f652d27614706f824384055ede7d4e5d684f59bc354c4"
+  version "0.3.0"
+  sha256 "06ee66d37f59b5050b3f6fb24dca901fe4d12f7e15dee514c3339c6ee8d867ef"
 
   url "https://api.douglaslassance.me/v1/gitoptic/download/#{version}/aarch64-apple-darwin"
   name "Gitoptic"
   desc "Visual diffs for binary files in Git"
-  homepage "https://github.com/douglaslassance/gitoptic"
+  homepage "https://douglaslassance.me/gitoptic"
 
   livecheck do
     url "https://api.douglaslassance.me/v1/gitoptic"
@@ -19,8 +19,8 @@ cask "gitoptic" do
   app "Gitoptic.app"
 
   zap trash: [
-    "~/Library/Application Support/dev.gitoptic.app",
-    "~/Library/Caches/dev.gitoptic.app",
-    "~/Library/Preferences/dev.gitoptic.app.plist",
+    "~/Library/Application Support/me.douglaslassance.gitoptic",
+    "~/Library/Caches/me.douglaslassance.gitoptic",
+    "~/Library/Preferences/me.douglaslassance.gitoptic.plist",
   ]
 end
