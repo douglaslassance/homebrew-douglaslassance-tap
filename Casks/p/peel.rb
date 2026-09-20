@@ -1,11 +1,11 @@
 cask "peel" do
-  version "1.2.0"
-  sha256 "80c252b551748aba9cc189f8b209d7410a7f1888d51d65a02d701529a4b642e6"
+  version "1.3.0"
+  sha256 "ae5c58418dce2bdf6a510351d8a2e0ed4d042b9d7836c4a4df4715bd08fefa7f"
 
   url "https://api.douglaslassance.me/v1/peel/download/#{version}/aarch64-apple-darwin"
   name "Peel"
   desc "Browse different"
-  homepage "https://peel.douglaslassance.me/"
+  homepage "https://douglaslassance.me/peel"
 
   livecheck do
     url "https://api.douglaslassance.me/v1/peel"
