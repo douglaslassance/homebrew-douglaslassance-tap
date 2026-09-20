@@ -1,6 +1,6 @@
 cask "rollpaper" do
-  version "1.1.0"
-  sha256 "071d8ce3890d2026449bf6017ade7071bba5a8f9bfd742ce9cd75ab74ff58013"
+  version "1.1.1"
+  sha256 "bd6cb93b7a7e21f1290549431519159c28b0eb2823d9120563395e2a1f7b650e"
 
   url "https://api.douglaslassance.me/v1/rollpaper/download/#{version}/aarch64-apple-darwin"
   name "Rollpaper"
