@@ -1,11 +1,11 @@
 cask "rollpaper" do
-  version "1.0.0"
-  sha256 "dae333ce132571eae129c0a1f14c9cc888c45e9757c9ff79d2b48148c73a8b75"
+  version "1.1.0"
+  sha256 "071d8ce3890d2026449bf6017ade7071bba5a8f9bfd742ce9cd75ab74ff58013"
 
   url "https://api.douglaslassance.me/v1/rollpaper/download/#{version}/aarch64-apple-darwin"
   name "Rollpaper"
   desc "Menu-bar wallpaper rotator"
-  homepage "https://github.com/douglaslassance/rollpaper"
+  homepage "https://douglaslassance.me/rollpaper"
 
   livecheck do
     url "https://api.douglaslassance.me/v1/rollpaper"
