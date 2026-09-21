@@ -11,15 +11,26 @@
 # Adapted only where a third-party tap differs from homebrew/cask: this repo has
 # to be linked into Homebrew's Taps directory and trusted before its casks can
 # be loaded. Re-check against upstream when Homebrew changes their CI.
+#
+# This tap holds both casks and formulae, which Homebrew tests with two
+# different tools. `brew generate-cask-ci-matrix` rejects any Ruby file outside
+# `Casks/`, so this workflow is gated on that directory and formulae.yml covers
+# `Formula/` with `brew test-bot`.
 
-name: CI
+name: casks
 
 on:
   push:
     branches:
       - main
       - master
+    paths:
+      - Casks/**
+      - .github/workflows/casks.yml
   pull_request:
+    paths:
+      - Casks/**
+      - .github/workflows/casks.yml
   merge_group:
   workflow_dispatch:
     inputs:
