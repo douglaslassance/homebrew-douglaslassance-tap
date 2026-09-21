@@ -5,8 +5,8 @@ class Gitalong < Formula
   # brew readall uses on every platform context (satisfying its
   # "formula requires a URL" check). depends_on :macos prevents actual
   # installation on Linux. on_macos > on_intel overrides for Intel macOS.
-  url "https://github.com/douglaslassance/gitalong/releases/download/1.0.0/gitalong-1.0.0-aarch64-apple-darwin.tar.gz"
-  sha256 "4535b171a8d10aeedac404d840114188eb8dd5883d96ad3d730aa23822b51fc4"
+  url "https://github.com/douglaslassance/gitalong/releases/download/1.1.0/gitalong-1.1.0-aarch64-apple-darwin.tar.gz"
+  sha256 "5a914b29de353d62cfe338252f6866a02535e876a2f7e52f14247f8545817aa0"
   license "MIT"
 
   livecheck do
@@ -19,8 +19,8 @@ class Gitalong < Formula
 
   on_macos do
     on_intel do
-      url "https://github.com/douglaslassance/gitalong/releases/download/1.0.0/gitalong-1.0.0-x86_64-apple-darwin.tar.gz"
-      sha256 "f8f586491f0537e9fa8369a61111eaf72d5fe333c16e966d1d381df60f75cf4c"
+      url "https://github.com/douglaslassance/gitalong/releases/download/1.1.0/gitalong-1.1.0-x86_64-apple-darwin.tar.gz"
+      sha256 "f525ae6fac6b8cadcf6c4d3236d01ef8d6b16d5a4b653adc640faf2d8c35de4a"
     end
   end
 
