@@ -1,6 +1,6 @@
 cask "grimoire" do
-  version "0.1.0"
-  sha256 "353d0f6c291d84305b3ba4b8bb18fafa33fdefb97a829f74110950380533d3c6"
+  version "0.2.0"
+  sha256 "0539b04017ccf9a69909c20606d8bd1848456fd7aabb5e6a170f5e0fed13058b"
 
   url "https://api.douglaslassance.me/v1/grimoire/download/#{version}/aarch64-apple-darwin"
   name "Grimoire"
