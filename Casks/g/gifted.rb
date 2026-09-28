@@ -1,6 +1,6 @@
 cask "gifted" do
-  version "0.3.0"
-  sha256 "5132061775053d204f89b508536e5fd212cae6dffeea8b5457a8ae69b571af45"
+  version "0.4.0"
+  sha256 "c2764a27b48b1019fa08cb2dab29db21512b1af69ffc38e8147c159be6f39bb5"
 
   url "https://api.douglaslassance.me/v1/gifted/download/#{version}/aarch64-apple-darwin"
   name "Gifted"
