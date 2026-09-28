@@ -1,6 +1,6 @@
 cask "mamecase" do
-  version "0.4.0"
-  sha256 "820e52a99342597dacbf42fc43b5b461099abad1922c4d749fc118f0e3a847d7"
+  version "0.5.0"
+  sha256 "f04783e468d70ea40126509048a3b8175a2424fbd79aa2aff34b163ee8912585"
 
   url "https://api.douglaslassance.me/v1/mamecase/download/#{version}/aarch64-apple-darwin"
   name "Mamecase"
