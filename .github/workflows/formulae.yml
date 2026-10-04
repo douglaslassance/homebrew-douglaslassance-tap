@@ -1,9 +1,5 @@
-# Formula half of this tap's CI, the counterpart to casks.yml.
-#
-# Homebrew tests formulae with `brew test-bot`, the tool homebrew-core's own CI
-# runs, rather than the cask matrix. Gated on `Formula/` so a cask pull request
-# never pays for it, and so the cask matrix never sees a formula: it rejects any
-# Ruby file outside `Casks/`.
+# This tap's CI. Homebrew tests formulae with `brew test-bot`, the tool
+# homebrew-core's own CI runs.
 #
 # macOS only. The formulae here declare `depends_on :macos`, so a Linux runner
 # would fail on a formula that cannot install there. Both architectures run,
